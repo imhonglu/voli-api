@@ -1,14 +1,14 @@
 import {
   ArgumentsHost,
   Catch,
-  ConflictException,
   HttpException,
   HttpServer,
   IntrinsicException,
 } from "@nestjs/common";
 import { AbstractHttpAdapter, BaseExceptionFilter } from "@nestjs/core";
+import { TypeORMError } from "typeorm";
+import { EntityNotFoundException } from "./exceptions/entity-not-found.exception";
 import { UnexpectedServerException } from "./exceptions/unexpected-server.exception";
-import { PostgresError, isPostgresError } from "./utils/is-postgres-error";
 
 @Catch()
 export class AllExceptionsFilter extends BaseExceptionFilter {
@@ -42,9 +42,9 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
 
   private processException(exception: unknown): {
     error: HttpException;
-    cause: unknown;
+    cause?: unknown;
   } {
-    if (isPostgresError(exception)) {
+    if (exception instanceof TypeORMError) {
       return this.handlePostgresError(exception);
     }
 
@@ -65,13 +65,12 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
   }
 
   private handlePostgresError(
-    exception: PostgresError,
+    exception: TypeORMError,
   ): ReturnType<typeof this.processException> {
-    switch (exception.driverError.code) {
-      case "23505":
+    switch (exception.name) {
+      case "EntityNotFoundError":
         return {
-          error: new ConflictException("이미 존재하는 데이터입니다."),
-          cause: exception.driverError.detail,
+          error: new EntityNotFoundException(),
         };
 
       default:
