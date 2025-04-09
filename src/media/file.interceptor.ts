@@ -15,7 +15,7 @@ import {
   Type,
   mixin,
 } from "@nestjs/common";
-import { UnsupportedFileTypeException } from "./exceptions/unsupported-file-type.exception";
+import { FileUploadFailedException } from "./exceptions/file-upload-failed.exception";
 import { UploadedFile } from "./types/uploaded-file.interface";
 import { hasContentTypeHeader } from "./utils/has-content-type-header";
 import { loadDetectFileType } from "./utils/load-detect-file-type";
@@ -93,7 +93,9 @@ export function FileInterceptor(fieldName: string): Type<NestInterceptor> {
                 }
 
                 if (!mimeType.startsWith(this.acceptedMimePrefix)) {
-                  error = new UnsupportedFileTypeException(mimeType);
+                  error = new FileUploadFailedException(
+                    `지원하지 않는 파일 유형입니다: ${mimeType}`,
+                  );
                 }
               }
 
@@ -133,7 +135,16 @@ export function FileInterceptor(fieldName: string): Type<NestInterceptor> {
               this.logger.error(err);
             }
           });
-          reject(err);
+
+          if (!(err instanceof FileUploadFailedException)) {
+            this.logger.error(err);
+
+            reject(
+              new FileUploadFailedException("파일 업로드에 실패했습니다."),
+            );
+          } else {
+            reject(err);
+          }
         });
 
         req.pipe(busboy);
