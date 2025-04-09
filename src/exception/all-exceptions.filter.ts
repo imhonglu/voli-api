@@ -1,9 +1,11 @@
+import { Request } from "@/types/request.interface";
 import {
   ArgumentsHost,
   Catch,
   HttpException,
   HttpServer,
   IntrinsicException,
+  Logger,
 } from "@nestjs/common";
 import { AbstractHttpAdapter, BaseExceptionFilter } from "@nestjs/core";
 import { TypeORMError } from "typeorm";
@@ -12,6 +14,8 @@ import { UnexpectedServerException } from "./exceptions/unexpected-server.except
 
 @Catch()
 export class AllExceptionsFilter extends BaseExceptionFilter {
+  private readonly logger = new Logger(AllExceptionsFilter.name);
+
   catch(exception: unknown, host: ArgumentsHost) {
     super.catch(exception, host);
   }
@@ -21,22 +25,19 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
     host: ArgumentsHost,
     applicationRef: AbstractHttpAdapter | HttpServer,
   ) {
-    const { error, cause } = this.processException(exception);
-    const httpResponse = host.getArgByIndex(1);
+    const req = host.switchToHttp().getRequest<Request>();
+    const res = host.getArgByIndex(1);
 
-    if (!applicationRef.isHeadersSent(httpResponse)) {
-      applicationRef.reply(
-        httpResponse,
-        error.getResponse(),
-        error.getStatus(),
-      );
+    const { error, cause } = this.processException(exception);
+
+    if (!applicationRef.isHeadersSent(res)) {
+      applicationRef.reply(res, error.getResponse(), error.getStatus());
     } else {
-      applicationRef.end(httpResponse);
+      applicationRef.end(res);
     }
 
     if (cause) {
-      // @ts-expect-error
-      AllExceptionsFilter.logger.error(cause);
+      this.logger.error(Object.assign(cause, { requestId: req.requestId }));
     }
   }
 
