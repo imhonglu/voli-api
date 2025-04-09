@@ -29,6 +29,5 @@ jobs:
         timeout-minutes: 1
 
       - name: Run tests
-        # TODO: run only related tests
         run: pnpm test
         timeout-minutes: 1
