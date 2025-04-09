@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
   "version": "0.2",
-  "words": ["voli", "pgsql", "commitlint"],
+  "words": ["voli", "pgsql", "commitlint", "bullmq"],
   "dictionaries": ["typescript", "node"],
   "ignorePaths": ["pnpm-*.yaml", "dist/", ".github/", ".vscode/"],
   "useGitignore": true
