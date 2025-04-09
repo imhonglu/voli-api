@@ -3,3 +3,4 @@ onlyBuiltDependencies:
   - '@nestjs/core'
   - '@scarf/scarf'
   - '@swc/core'
+  - msgpackr-extract
