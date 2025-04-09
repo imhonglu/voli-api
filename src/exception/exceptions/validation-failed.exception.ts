@@ -7,7 +7,7 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class ValidationFailedException implements HttpExceptionBody {
   @ApiProperty({
-    example: "email must be an email",
+    example: "이메일 형식이 올바르지 않습니다.",
   })
   message!: HttpExceptionBodyMessage;
 
