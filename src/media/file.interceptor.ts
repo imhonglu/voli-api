@@ -4,6 +4,7 @@ import { unlink } from "node:fs/promises";
 import { extname, join } from "node:path";
 import { getSystemErrorName } from "node:util";
 import { EnvConfigService } from "@/config/env-config.service";
+import { Request } from "@/types/request.interface";
 import Busboy from "@fastify/busboy";
 import {
   CallHandler,
@@ -14,7 +15,6 @@ import {
   Type,
   mixin,
 } from "@nestjs/common";
-import type { Request } from "express";
 import { UnsupportedFileTypeException } from "./exceptions/unsupported-file-type.exception";
 import { UploadedFile } from "./types/uploaded-file.interface";
 import { hasContentTypeHeader } from "./utils/has-content-type-header";

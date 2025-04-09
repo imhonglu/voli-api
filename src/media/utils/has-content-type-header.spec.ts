@@ -1,4 +1,4 @@
-import type { Request } from "express";
+import type { Request } from "@/types/request.interface";
 import { hasContentTypeHeader } from "./has-content-type-header";
 
 it("should return true when content-type header exists with a value", () => {

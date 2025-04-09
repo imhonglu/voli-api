@@ -1,7 +1,8 @@
 import { EnvConfigModule } from "@/config/env-config.module";
 import { EnvConfigService } from "@/config/env-config.service";
+import { logger } from "@/logger/logger.middleware";
 import { MediaModule } from "@/media/media.module";
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AppController } from "./app.controller";
 
@@ -28,4 +29,8 @@ import { AppController } from "./app.controller";
   ],
   controllers: [AppController],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(logger).forRoutes("*");
+  }
+}

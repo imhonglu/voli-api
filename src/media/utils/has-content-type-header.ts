@@ -1,4 +1,4 @@
-import type { Request } from "express";
+import type { Request } from "@/types/request.interface";
 
 export function hasContentTypeHeader(
   headers: Request["headers"],
